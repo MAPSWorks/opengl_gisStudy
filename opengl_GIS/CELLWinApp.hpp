@@ -1,52 +1,48 @@
 #pragma once
 
-#include    "CELLApp.hpp"
+#include    "lifeiApp.h"
 #include    <windows.h>
 #include    <tchar.h>
-#include "CELLGLContext.h"
-#include "CELLOpenGL.h"
-#include "CELLShader.hpp"
-#include "CELLShpReader.h"
+#include    "lifeiGLContext.h"
+#include    "CELLOpenGL.h"
+#include    "CELLFrameBigMap.h"
+#include    "lifeiContext.h"
+#include    "lifeiThread.h"
+#include    "lifeiEvent.h"
+#include    "LifeiProgramLibrary.h"
+#include    "CELLResourceMgr.hpp"
+#include    <assert.h>
+
 
 namespace CELL
 {
-    class CELLWinApp :public CELLApp
+    class CELLWinApp 
+        :public LifeiApp
+        ,public lifeiThread
     {
     public:
-		//窗口句柄
-        HWND    _hWnd;
-		//窗口宽度
-		int		_width;
-		//窗口高度
-		int		_height;
-		CELLGLContext _context;
-		CELLOpenGL _device;
-		PROGRAM_P2_AC4 _shader;
-		PROGRAM_P2_C4 _shaderShp;
-		CELLShpReader _shpReader;
-
-		struct vertex
-		{
-			CELL::float2 pos;
-			CELL::Rgba4Byte color;
-		};
+        HWND            _hWnd;
+		LifeiGLContext  _contextGL;
+		lifeiContext     _context;
+        CELLResourceMgr _resMgr;
+        CELLOpenGL      _device;
+        lifeiFrame*      _frame;
+        bool            _threadRun;
+        bool            _makeReuslt;
+        lifeiEvent      _event;
     public:
         CELLWinApp()
         {
-            _hWnd   =   0;
+            _hWnd               =   0;
+            _frame              =   0;
+            _threadRun          =   true;
+            _makeReuslt         =   false;
+            _context._device    =   &_device;
+            _context._resMgr    =   &_resMgr;
         }
     public:
-		//初始化数据
-		void InitData()
-		{
-			_shader.initialize();
-			_shaderShp.initialize();
-			std::string strShpName = "data/china_province.shp";
-			_shpReader.read(strShpName.c_str());
-		}
-
         /// 创建窗口函数
-        virtual bool    createWindow(int width, int height,HINSTANCE hInst)
+        virtual bool    createWindow(int width, int height,INSTANCE hInst)
         {
             /// 1.注册窗口类
             /// 2.创建窗口
@@ -65,13 +61,13 @@ namespace CELL
             wcex.hCursor        =   LoadCursor(nullptr, IDC_ARROW);
             wcex.hbrBackground  =   (HBRUSH)(COLOR_WINDOW + 1);
             wcex.lpszMenuName   =   0;
-            wcex.lpszClassName  =   _T("gis_bim");
+            wcex.lpszClassName  =   _T("CELL.BigMap");
             wcex.hIconSm        =   0;
             RegisterClassExW(&wcex);
             /// 创建窗口
             _hWnd   =   CreateWindow(
-                                      _T("gis_bim")
-                                    , _T("gis_bim")
+                                      _T("CELL.BigMap")
+                                    , _T("BigMap")
                                     , WS_OVERLAPPEDWINDOW
                                     , CW_USEDEFAULT
                                     , 0
@@ -88,126 +84,240 @@ namespace CELL
 
             ShowWindow(_hWnd,SW_SHOW);
             UpdateWindow(_hWnd);
-			HDC hDC = GetDC(_hWnd);
-			if (!_context.Init(_hWnd, hDC))
-			{
-				DestroyWindow(_hWnd);
-				return false;
-			}
-			//初始化数据
-			this->InitData();
-			return true;
+
+            HDISPLAY    hDC     =   GetDC(_hWnd);
+            if(!_contextGL.init(_hWnd,hDC))
+            {
+                DestroyWindow(_hWnd);
+                return  false;
+            }
+            char    szFileName[CELL_PATH_LENGTH]    =   {0};
+            GetModuleFileNameA(0,szFileName,sizeof(szFileName));
+            std::string     strPath =   szFileName;
+            std::size_t     pos     =   strPath.rfind("\\");
+            if (pos != std::string::npos)
+            {
+                std::string exePath =   strPath.substr(0,pos);
+                strcpy(_context._pathEXE,exePath.c_str());
+                pos     =   exePath.rfind("\\");
+                if (pos != std::string::npos)
+                {
+                    std::string resPath = exePath.substr(0,pos);
+                    resPath +=  "/data";
+                    strcpy(_context._pathRes,resPath.c_str());
+                }
+            }
+            _device.initialize();
+            _resMgr._path   =   _context._pathRes;
+            _context._resMgr->initialize(_context._device);
+            
+            return  true;
+        }
+
+        /// <summary>
+        /// 创建框架
+        /// </summary>
+        virtual lifeiFrame*  createFrame()
+        {
+            if (IsWindow(_hWnd))
+            {
+                RECT    rect;
+                GetClientRect(_hWnd, &rect);
+                _context._width     =   rect.right - rect.left;
+                _context._height    =   rect.bottom - rect.top;
+            }
+            else
+            {
+                _context._width     =   64;
+                _context._height    =   64;
+            }
+            return  new CELLFrameBigMap(_context);
         }
         ///  入口函数
         virtual void    main(int argc, char** argv)
         {
-            MSG msg =   {0};
-            // 主消息循环: 
-#if 0
-            while (GetMessage(&msg, nullptr, 0, 0))
-            {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-#else
-			while (msg.message != WM_QUIT)
-			{			
-				if(PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
-				}
-				this->render();
-			}
 
+            _frame  =   createFrame();
+
+            /// 解除与主线程的绑定
+            _contextGL.makeCurrentNone();
+
+            if (_frame != 0)
+            {
+                lifeiThread::start();
+
+                _event.wait();
+                if (!_makeReuslt)
+                {
+					lifeiThread::join();
+                    delete  _frame;
+                    _contextGL.shutdown();
+                    return;
+                }
+                MSG msg = { 0 };
+#if 1
+                /// 主消息循环: 
+                /// PeekMessage
+                while (GetMessage(&msg, nullptr, 0, 0))
+                {
+                    TranslateMessage(&msg);
+                    DispatchMessage(&msg);
+                }
+#else
+                /// 主消息循环: 
+                /// PeekMessage
+                while (msg.message != WM_QUIT)
+                {
+                    if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+                    {
+                        TranslateMessage(&msg);
+                        DispatchMessage(&msg);
+                    }
+                    render();
+                }
+                _contextGL.shutdown();
 #endif
-			_context.shutdown();
+            }
+            
         }
 
-		//绘制函数
-		void render()
-		{
-			_device.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			_device.clearColor(0, 0, 0, 1);
-			//视口
-			_device.setViewPort(0, 0, _width, _height);
-			
-			CELL::matrix4 longLatPrj = CELL::ortho<float>(_shpReader._xMin, _shpReader._xMax, _shpReader._yMin, _shpReader._yMax,-100.0,100.0);
-			_shaderShp.begin();
-			glUniformMatrix4fv(_shaderShp._MVP, 1, false, longLatPrj.data());
-			_shpReader.render(_shaderShp);
-			_shaderShp.end();
-			_context.swapBuffer();
-		}
-		LRESULT eventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-		{           
-			switch (message)
+        /// 绘制函数
+        virtual void    render()
+        {
+            if (_frame == 0)
             {
-			case WM_LBUTTONDOWN:
+                return;
+            }
+            _frame->update(_context);
+            _frame->onFrameStart(_context);
+            _frame->onFrameEnd(_context);
+            _contextGL.swapBuffer();
+        }
+        //////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// 创建完成通知函数
+        /// </summary>
+        virtual bool    onCreate()
+        {
+            _makeReuslt =   _contextGL.makeCurrent();
+            assert(_makeReuslt);
+            _event.set();
+            return  _makeReuslt;
+        }
+     
+        /// <summary>
+        /// 线程执行函数
+        /// </summary>
+        virtual bool    onRun()
+        {
+            while (_threadRun)
+            {
+                render();
+            }
+            return  false;
+        }
+        /// <summary>
+        /// 结束函数
+        /// </summary>
+        virtual bool    onDestroy()
+        {
+            _contextGL.shutdown();
+            return  false;
+        }
+
+    protected:
+        LRESULT         eventProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+        {
+            switch (message)
+            {
+            case WM_LBUTTONDOWN:
+                _frame->onLButtonDown(LOWORD(lParam),HIWORD(lParam));
+                break;
+            case WM_LBUTTONUP:
+                _frame->onLButtonUp(LOWORD(lParam),HIWORD(lParam));
+                break;
+			case WM_RBUTTONDOWN:
+				_frame->onRButtonDown(LOWORD(lParam), HIWORD(lParam));
 				break;
-			case WM_LBUTTONUP:
+			case WM_RBUTTONUP:
+				_frame->onRButtonUp(LOWORD(lParam), HIWORD(lParam));
 				break;
-			case WM_MOUSEMOVE:
+			case WM_MBUTTONDOWN:
+				_frame->onMButtonDown(LOWORD(lParam), HIWORD(lParam));
 				break;
-			case WM_MOUSEWHEEL:
+			case WM_MBUTTONUP:
+				_frame->onMButtonUp(LOWORD(lParam), HIWORD(lParam));
 				break;
-			case WM_SIZE:
-			{
-				if (::IsWindow(hWnd))
-				{
-					RECT rc;
-					GetClientRect(hWnd, &rc);
-					_width = rc.right - rc.left;
-					_height = rc.bottom - rc.top;
-				}
-				
-			}
-				break;
-            case WM_COMMAND:
+            case WM_MOUSEMOVE:
+                _context._mouseX = LOWORD(lParam);
+                _context._mouseY = HIWORD(lParam);
+                _frame->onMouseMove(LOWORD(lParam), HIWORD(lParam));
+                break;
+            case WM_MOUSEWHEEL:
+
+                _frame->onMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
+                break;
+            case WM_KEYDOWN:
+                _frame->onKeyDown(wParam);
+                break;
+            case WM_KEYUP:
+                _frame->onKeyUp(wParam);
                 break;
             case WM_PAINT:
                 {
                     PAINTSTRUCT ps;
                     HDC hdc = BeginPaint(hWnd, &ps);
-                    // TODO: 在此处添加使用 hdc 的任何绘图代码...
                     EndPaint(hWnd, &ps);
                 }
                 break;
+            case WM_SIZE:
+                {
+                    if(IsWindow(_hWnd))
+                    { 
+                        RECT    rect;
+                        GetClientRect(_hWnd,&rect);
+                        _context._width     =   rect.right - rect.left;
+                        _context._height    =   rect.bottom - rect.top;
+                    }
+                }
+                break;
             case WM_DESTROY:
+                _threadRun  =   false;
+				lifeiThread::join();
                 PostQuitMessage(0);
                 break;
             default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
+                return  DefWindowProc(hWnd, message, wParam, lParam);
             }
-			return S_OK;
-		}
+            return  S_OK;
+        }
+
     protected:
         static  LRESULT CALLBACK  wndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
-			if (WM_CREATE == message )
-			{
-				CREATESTRUCT * pSTRUCT = (CREATESTRUCT*)lParam;
-				CELLWinApp * pApp = (CELLWinApp *)pSTRUCT->lpCreateParams;
-#ifndef GWL_USERDATA
-#define GWL_USERDATA -21
-#endif
-				SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG_PTR)pApp);
-				return pApp->eventProc(hWnd, WM_CREATE, wParam, lParam);
-			}
-			else
-			{
-				CELLWinApp * pApp = (CELLWinApp*)GetWindowLongPtr(hWnd, GWL_USERDATA);
-				if (pApp)
-				{
-					return pApp->eventProc(hWnd, message, wParam, lParam);
-				}
-				else
-				{
-					return DefWindowProc(hWnd, message, wParam, lParam);
-				}
-			}
-
-            return 0;
+            if (WM_CREATE == message)
+            {
+                CREATESTRUCT*   pSTRUCT     =   (CREATESTRUCT* )lParam;
+                CELLWinApp*     pApp        =   (CELLWinApp*)pSTRUCT->lpCreateParams;
+                #ifndef GWL_USERDATA
+                #define GWL_USERDATA (-21)
+                #endif
+                SetWindowLongPtr(hWnd,GWL_USERDATA,(LONG_PTR)pApp);
+                return  pApp->eventProc(hWnd,WM_CREATE,wParam,lParam);
+            }
+            else
+            {
+                CELLWinApp*     pApp        =       (CELLWinApp*)GetWindowLongPtr(hWnd,GWL_USERDATA);
+                if (pApp)
+                {
+                    return  pApp->eventProc(hWnd,message,wParam,lParam);
+                }
+                else
+                {
+                    return DefWindowProc(hWnd, message, wParam, lParam);
+                }
+            }
         }
     };
 

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -27,26 +27,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -83,9 +83,9 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>F:\opengl_gis\trunk\opengl_GIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Lifei\学习\opengl_gis\trunk\opengl_GIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -100,7 +100,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>E:\Lifei\opengl_gis\study\trunk\opengl_GIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\opengl_gis\trunk\opengl_GIS;D:\lifei\test\opengl_gis\trunk\opengl_GIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -111,7 +111,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -128,12 +128,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>E:\opengl_gis\trunk\opengl_GIS;D:\lifei\test\opengl_gis\trunk\opengl_GIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -146,33 +147,58 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CELLApp.hpp" />
-    <ClInclude Include="CELLFeature.h" />
-    <ClInclude Include="CELLGLContext.h" />
+    <ClInclude Include="CELLImageLoader.hpp" />
     <ClInclude Include="CELLMath.hpp" />
     <ClInclude Include="CELLOpenGL.h" />
-    <ClInclude Include="CELLPlatform.hpp" />
+    <ClInclude Include="CELLResourceMgr.hpp" />
     <ClInclude Include="CELLShader.hpp" />
-    <ClInclude Include="CELLShpReader.h" />
+    <ClInclude Include="CELLTask.hpp" />
+    <ClInclude Include="CELLTaskSystem.hpp" />
+    <ClInclude Include="CELLTerrain.h" />
+    <ClInclude Include="CELLFrameBigMap.h" />
+    <ClInclude Include="CELLTileTask.hpp" />
     <ClInclude Include="CELLWinApp.hpp" />
     <ClInclude Include="gl\eglew.h" />
     <ClInclude Include="gl\glew.h" />
     <ClInclude Include="gl\glxew.h" />
     <ClInclude Include="gl\wglew.h" />
-    <ClInclude Include="opengl_GIS.h" />
+    <ClInclude Include="lifeiApp.h" />
+    <ClInclude Include="lifeiCamera.h" />
+    <ClInclude Include="lifeiContext.h" />
+    <ClInclude Include="lifeiEvent.h" />
+    <ClInclude Include="lifeiFrame.h" />
+    <ClInclude Include="lifeiGLContext.h" />
+    <ClInclude Include="lifeiImage.h" />
+    <ClInclude Include="lifeiInput.h" />
+    <ClInclude Include="lifeiMutex.h" />
+    <ClInclude Include="lifeiObject.h" />
+    <ClInclude Include="lifeiPlatform.h" />
+    <ClInclude Include="LifeiProgramLibrary.h" />
+    <ClInclude Include="lifeiQuadTree.h" />
+    <ClInclude Include="lifeiSemaphore.h" />
+    <ClInclude Include="lifeiTerrainInterface.h" />
+    <ClInclude Include="lifeiThread.h" />
+    <ClInclude Include="lifeiTimeStamp.hpp" />
+    <ClInclude Include="OPENGL_GIS.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="shp\shapefil.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CELLImageLoader.cpp" />
     <ClCompile Include="CELLOpenGL.cpp" />
+    <ClCompile Include="CELLFrameBigMap.cpp" />
+    <ClCompile Include="CELLTerrain.cpp" />
     <ClCompile Include="glew.c" />
-    <ClCompile Include="opengl_GIS.cpp" />
+    <ClCompile Include="lifeiQuadTree.cpp" />
+    <ClCompile Include="OPENGL_GIS.cpp" />
     <ClCompile Include="shp\dbfopen.c" />
     <ClCompile Include="shp\safileio.c" />
     <ClCompile Include="shp\shpopen.c" />
     <ClCompile Include="shp\shptree.c" />
+    <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

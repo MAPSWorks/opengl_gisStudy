@@ -1,6 +1,6 @@
 #pragma once
 
-#include    "CELLPlatform.hpp"
+#include    "lifeiPlatform.h"
 
 namespace   CELL
 { 
@@ -227,6 +227,14 @@ namespace   CELL
         /**
         *   创建纹理函数
         */
+        static  Texture1d   createTexture1d(
+                            int level,
+                            int intFmt,
+                            int width,
+                            int border,
+                            int srcFmt,
+                            int type,
+                            const void* data);
         /**
         *   创建2D纹理
         */
