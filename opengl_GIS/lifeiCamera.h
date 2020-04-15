@@ -1,13 +1,15 @@
 #pragma once
 
-#include "lifeiObject.h"
-#include "CELLMath.hpp"
+#include "lifeiObject_2.h"
+#include "tvec2.h"
+#include "tray.h"
+#include "cameraMath.h"
 
 namespace CELL
 {
 	//左手坐标系
 #define COORD_LH
-	class lifeiCamera : public lifeiObject
+	class lifeiCamera : public lifeiObject_2
 	{
 	public:
 		enum
@@ -137,7 +139,7 @@ namespace CELL
 		{
 			return _matView;
 		}
-
+		
 		//正交投影
 		void ortho(real left, real right, real bottom, real top, real zNear, real zFar)
 		{
@@ -151,6 +153,7 @@ namespace CELL
 			_matProj = CELL::perspective<real>(fovY, aspect, zNear, zFar);
 		}
 
+		/*
 		//世界坐标转化为窗口坐标
 		bool project(const real4& world, real4& screen)
 		{
@@ -174,24 +177,49 @@ namespace CELL
 
 			return true;
 		}
+		*/
+		//世界坐标转为窗口坐标
+		bool project_2(const real4& world, real4& screen)
+		{
+			screen = (_matProj * _matView * _matWorld) * world;
+			if (screen.w == 0.0f)
+			{
+				return false;
+			}
+			screen.x /= screen.w;
+			screen.y /= screen.w;
+			screen.z /= screen.w;
+
+			//将范围到0-1
+			screen.x = screen.x * 0.5f + 0.5f;
+			screen.y = screen.y  * 0.5f + 0.5f;
+			screen.z = screen.z * 0.5f + 0.5f;
+
+			//映射到视口
+			screen.x = screen.x * _viewSize.x;
+			screen.y = _viewSize.y - screen.y * _viewSize.y;
+
+			return true;
+		}
 
 		//世界坐标转化为窗口坐标
 		real2 worldToScreen(const real3& world)
 		{
 			real4 worlds(world.x, world.y, world.z, 1);
 			real4 screens;
-			project(worlds, screens);
+			project_2(worlds, screens);
 			return real2(screens.x, screens.y);
 		}
+		
 		//世界坐标转化为窗口坐标
 		int2 worldToScreenInt(const real3& world)
 		{
 			real4 worlds(world.x, world.y, world.z, 1);
 			real4 screens;
-			project(worlds, screens);
+			project_2(worlds, screens);
 			return int2((int)screens.x, (int)screens.y);
 		}
-
+		
 		//窗口坐标转化为世界坐标
 		bool unProject(const real4& screen, real4& world)
 		{
@@ -455,8 +483,14 @@ namespace CELL
 			_eye += normalize(_right) * _speed * fElapsed;
 			_target += normalize(_right) * _speed * fElapsed;
 		}
-
+		/*
 		virtual void moveFront(real fElapsed)
+		{
+			_eye += _dir * _speed * fElapsed;
+			_target += _dir * _speed * fElapsed;
+		}
+		*/
+		virtual void moveFront_2(real fElapsed)
 		{
 			_eye += _dir * _speed * fElapsed;
 			_target += _dir * _speed * fElapsed;

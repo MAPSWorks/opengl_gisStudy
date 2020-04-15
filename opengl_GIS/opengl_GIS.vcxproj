@@ -22,6 +22,7 @@
     <ProjectGuid>{517EC519-5D7A-4ACF-B7C6-3F7D5F563E35}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>opengl_GIS</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -31,9 +32,9 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -71,6 +72,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>CELLGISPlatform</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -91,6 +93,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -98,7 +101,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;ENGINE_API_EXP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>E:\opengl_gis\trunk\opengl_GIS;D:\lifei\test\opengl_gis\trunk\opengl_GIS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -106,6 +109,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -123,6 +128,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,77 +147,109 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="CELLImageLoader.hpp" />
-    <ClInclude Include="CELLMath.hpp" />
-    <ClInclude Include="CELLOpenGL.h" />
-    <ClInclude Include="CELLResourceMgr.hpp" />
-    <ClInclude Include="CELLShader.hpp" />
-    <ClInclude Include="CELLTask.hpp" />
-    <ClInclude Include="CELLTaskSystem.hpp" />
-    <ClInclude Include="CELLTerrain.h" />
-    <ClInclude Include="CELLFrameBigMap.h" />
-    <ClInclude Include="CELLTileTask.hpp" />
-    <ClInclude Include="CELLWinApp.hpp" />
+    <ClInclude Include="AxisALignedBox.h" />
+    <ClInclude Include="AxisALignedBox2d.h" />
+    <ClInclude Include="cameraMath.h" />
+    <ClInclude Include="CELLDXTCompressor.h" />
     <ClInclude Include="gl\eglew.h" />
     <ClInclude Include="gl\glew.h" />
     <ClInclude Include="gl\glxew.h" />
     <ClInclude Include="gl\wglew.h" />
-    <ClInclude Include="lifeiApp.h" />
+    <ClInclude Include="export.h" />
+    <ClInclude Include="IFeatureLine.h" />
+    <ClInclude Include="ILayer.h" />
+    <ClInclude Include="IFeaturePoint.h" />
+    <ClInclude Include="IFeaturePolygon.h" />
+    <ClInclude Include="IGISPlatform.h" />
+    <ClInclude Include="IPlugin.h" />
+    <ClInclude Include="IPluginTileManager.h" />
+    <ClInclude Include="lifeiApp_2.h" />
     <ClInclude Include="lifeiCamera.h" />
-    <ClInclude Include="lifeiContext.h" />
-    <ClInclude Include="lifeiEvent.h" />
-    <ClInclude Include="lifeiFrame.h" />
+    <ClInclude Include="lifeiContext_2.h" />
+    <ClInclude Include="lifeiEvent_2.h" />
+    <ClInclude Include="lifeiFeatureLine.h" />
+    <ClInclude Include="lifeiFeaturePoint.h" />
+    <ClInclude Include="lifeiFrameBigMap_2.h" />
+    <ClInclude Include="lifeiFrame_2.h" />
+    <ClInclude Include="lifeiFrustum.h" />
+    <ClInclude Include="lifeiGIS3DPlatform.h" />
     <ClInclude Include="lifeiGLContext.h" />
     <ClInclude Include="lifeiImage.h" />
-    <ClInclude Include="lifeiInput.h" />
-    <ClInclude Include="lifeiMutex.h" />
-    <ClInclude Include="lifeiObject.h" />
-    <ClInclude Include="lifeiPlatform.h" />
+    <ClInclude Include="lifeiImageLoader.h" />
+    <ClInclude Include="lifeiInput_2.h" />
+    <ClInclude Include="lifeiMathUtil.h" />
+    <ClInclude Include="lifeiMutex_2.h" />
+    <ClInclude Include="lifeiObject_2.h" />
+    <ClInclude Include="lifeiOpengl.h" />
+    <ClInclude Include="lifeiProgram.h" />
     <ClInclude Include="LifeiProgramLibrary.h" />
-    <ClInclude Include="lifeiQuadTree.h" />
-    <ClInclude Include="lifeiSemaphore.h" />
-    <ClInclude Include="lifeiTerrainInterface.h" />
-    <ClInclude Include="lifeiThread.h" />
+    <ClInclude Include="lifeiQuadTree_2.h" />
+    <ClInclude Include="lifeiSemaphore_2.h" />
+    <ClInclude Include="lifeiShaderManager_2.h" />
+    <ClInclude Include="lifeiShpLayer.h" />
+    <ClInclude Include="lifeiSpatialReference_2.h" />
+    <ClInclude Include="lifeiTaskObserver_2.h" />
+    <ClInclude Include="lifeiTaskSystem_2.h" />
+    <ClInclude Include="lifeiTaskThread_2.h" />
+    <ClInclude Include="lifeiTask_2.h" />
+    <ClInclude Include="lifeiTerrainInterface_2.h" />
+    <ClInclude Include="lifeiTerrain_2.h" />
+    <ClInclude Include="lifeiTexture.h" />
+    <ClInclude Include="lifeiTexture3dID.h" />
+    <ClInclude Include="lifeiTextureMgr_2.h" />
+    <ClInclude Include="lifeiThread_2.h" />
+    <ClInclude Include="lifeiTileId.h" />
+    <ClInclude Include="lifeiTileTask_2.h" />
     <ClInclude Include="lifeiTimeStamp.hpp" />
-    <ClInclude Include="OPENGL_GIS.h" />
-    <ClInclude Include="Resource.h" />
+    <ClInclude Include="IFeature.h" />
+    <ClInclude Include="lifeiWinApp_2.h" />
+    <ClInclude Include="Plane.h" />
+    <ClInclude Include="group.h" />
+    <ClInclude Include="tmat3x3.h" />
+    <ClInclude Include="tmat4x4.h" />
+    <ClInclude Include="tray.h" />
+    <ClInclude Include="tvec2.h" />
+    <ClInclude Include="rapidxml.hpp" />
+    <ClInclude Include="rapidxml_print.hpp" />
     <ClInclude Include="shp\shapefil.h" />
     <ClInclude Include="stb_image.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
+    <ClInclude Include="tvec3.h" />
+    <ClInclude Include="tvec4.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CELLImageLoader.cpp" />
-    <ClCompile Include="CELLOpenGL.cpp" />
-    <ClCompile Include="CELLFrameBigMap.cpp" />
-    <ClCompile Include="CELLTerrain.cpp" />
+    <ClCompile Include="CELLDXTCompressor.cpp" />
     <ClCompile Include="glew.c" />
-    <ClCompile Include="lifeiQuadTree.cpp" />
-    <ClCompile Include="OPENGL_GIS.cpp" />
+    <ClCompile Include="lifeiFeatureLine.cpp" />
+    <ClCompile Include="lifeiFeaturePoint.cpp" />
+    <ClCompile Include="lifeiFrameBigMap_2.cpp" />
+    <ClCompile Include="lifeiGIS3DPlatform.cpp" />
+    <ClCompile Include="lifeiImageLoader.cpp" />
+    <ClCompile Include="lifeiOpenGL.cpp" />
+    <ClCompile Include="lifeiProgram.cpp" />
+    <ClCompile Include="lifeiQuadTree_2.cpp" />
+    <ClCompile Include="lifeiSemaphore_2.cpp" />
+    <ClCompile Include="lifeiShpLayer.cpp" />
+    <ClCompile Include="lifeiTaskSystem_2.cpp" />
+    <ClCompile Include="lifeiTaskThread_2.cpp" />
+    <ClCompile Include="lifeiTerrain_2.cpp" />
+    <ClCompile Include="lifeiTexture.cpp" />
+    <ClCompile Include="lifeiTextureMgr_2.cpp" />
+    <ClCompile Include="lifeiThread_2.cpp" />
+    <ClCompile Include="lifeiWinApp_2.cpp" />
     <ClCompile Include="shp\dbfopen.c" />
     <ClCompile Include="shp\safileio.c" />
     <ClCompile Include="shp\shpopen.c" />
     <ClCompile Include="shp\shptree.c" />
     <ClCompile Include="stb_image.cpp" />
-    <ClCompile Include="stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="opengl_GIS.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="opengl_GIS.ico" />
-    <Image Include="small.ico" />
+    <Xml Include="data\scene.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
